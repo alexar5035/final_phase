@@ -1,6 +1,5 @@
-
 #!/usr/bin/env python3
-# from phase 1
+
 import rospy
 import math
 # import the messages for reading the joint positions and sending joint commands
@@ -33,8 +32,8 @@ def ure5_initi():
 	pos_cmd_point.time_from_start = rospy.Duration(1.0) # here one second 
 	# starting position configuration
 	pos_cmd_point.positions[0] = math.pi/2
-	pos_cmd_point.positions[1] = -math.pi/3
-	pos_cmd_point.positions[3] = (2*math.pi)/3
+	pos_cmd_point.positions[1] = -math.pi/2
+	pos_cmd_point.positions[3] = -math.pi/2
 	pos_cmd_point.positions[4] = -math.pi/2
 	# add the trajectory point to the command
 	pos_cmd.points.append(pos_cmd_point)
