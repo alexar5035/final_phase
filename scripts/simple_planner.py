@@ -94,15 +94,15 @@ if __name__ == '__main__':
 			y_ang = 0.0
 			z_ang = 1.57
 			# Starting position 
-			add_point(0.3, -0.35, 0.3, x_ang, y_ang, z_ang, plan)
+			new_point(0.3, -0.35, 0.3, x_ang, y_ang, z_ang, plan)
 			# Position with x, y, z + radius
-			add_point(x, y, z+radius, x_ang, y_ang, z_ang, plan)
+			new_point(x, y, z+radius, x_ang, y_ang, z_ang, plan)
 			# Turn right 
-			add_point(0.3, -0.35, 0.3, x_ang, y_ang, z_ang, plan)
+			new_point(0.3, -0.35, 0.3, x_ang, y_ang, z_ang, plan)
 			# Decrease z to drop ball 
-			add_point(0.3, -0.35, z+radius, x_ang, y_ang, z_ang, plan)
+			new_point(0.3, -0.35, z+radius, x_ang, y_ang, z_ang, plan)
 			# Back to Start
-			add_point(0.3, -0.35, 0.3, x_ang, y_ang, z_ang, plan)
+			new_point(0.3, -0.35, 0.3, x_ang, y_ang, z_ang, plan)
 			
 			# publish the plan
 			plan_pub.publish(plan)
