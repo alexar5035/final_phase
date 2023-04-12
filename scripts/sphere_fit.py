@@ -12,16 +12,6 @@ a_matrix = []
 b_matrix = []
 recieved = False
 
-# fill output values
-fil_outx = 0.0
-fil_outy = 0.0
-fil_outz = 0.0
-fil_outr = 0.0
-
-# flags
-valid_params = False
-first_filter = True
-
 def receive(data):
 	global a_matrix
 	global b_matrix
@@ -108,13 +98,13 @@ if __name__ == '__main__':
 					# else if a filter has already occured
 					else:
 						# recieve the filtered data
-						xc = filter(xc, fil_outx, point_gain)
+						xc = filter(xc, fil_outx, pt_gain)
 						fil_outx = xc
-						yc = filter(yc, fil_outy, point_gain)
+						yc = filter(yc, fil_outy, pt_gain)
 						fil_outy = yc
-						zc = filter(zc, fil_outz, point_gain)
+						zc = filter(zc, fil_outz, pt_gain)
 						fil_outz = zc
-						r = filter(r, fil_outr, point_gain)
+						r = filter(r, fil_outr, r_gain)
 						fil_outr = r
 				# else if not tracking
 				else:

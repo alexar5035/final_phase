@@ -25,16 +25,17 @@ def process(image):
 	hsv = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
 	# HSV boundaries:
 	# lower yellow
-	l_yellow = np.array([22,2,1])
+	l_yellow = np.array([10,5,100])
 	# upper yellow 
-	u_yellow = np.array([60, 255, 255])
+	u_yellow = np.array([40, 255, 255])
 	# mask using boundaries
 	y_mask = cv2.inRange(hsv, l_yellow, u_yellow)
-	# removing background noise
-	background_array = np.zeros((720, 1280), dtype = "uint8")
-	img_rectangle = cv2.rectangle(background_array, (500,100), (800,600), (255,255,255), -1)
-	masked = cv2. bitwise_and(y_mask, img_rectangle)
-	return masked
+	# make the circle to filter out extra noise in surrounding area
+	circle = np.zeros((720,1280), dtype="uint8")
+	cv2.circle(circle, (535,300), 150, 255, -1)
+	# overlay filter on masked_img
+	filtered_img = cv2.bitwise_and(y_mask, circle)
+	return filtered_img
 	
 
 if __name__ == '__main__':
@@ -61,4 +62,3 @@ if __name__ == '__main__':
 			img_pub.publish(img_msg)
 		# pause until next iteration
 		rate.sleep()
-	
