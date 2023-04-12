@@ -1,70 +1,57 @@
 #!/usr/bin/env python3
 
 import rospy
+# transformation imports
 import tf2_ros
 from tf.transformations import *
 from geometry_msgs.msg import Quaternion
 import tf2_geometry_msgs
+# import sphere params
 from robot_vision_lectures.msg import SphereParams 
+# import plan, twist and bool messages
 from ur5e_control.msg import Plan
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Bool  
 
-sphere_x = 0
-sphere_y = 0
-sphere_z = 0
-sphere_radius = 0 
-recieved_sphere_data = False 
-rqt_toggle = False
-pause_toggle = False
+xraw = 0
+yraw = 0
+zraw = 0
+radiusraw = 0 
+recieved_sdata = False 
 
 # Adds points to plan
-def add_point(linearX, linearY, linearZ, angularX, angularY, angularZ, plan):
+def new_point(linX, linY, linZ, angX, angY, angZ, plan):
 	point = Twist()
 		
-	point.linear.x = linearX
-	point.linear.y = linearY
-	point.linear.z = linearZ
-	point.angular.x = angularX
-	point.angular.y = angularY
-	point.angular.z = angularZ
+	point.linear.x = linX
+	point.linear.y = linY
+	point.linear.z = linZ
+	point.angular.x = angX
+	point.angular.y = angY
+	point.angular.z = angZ
 		
 	plan.points.append(point)
 
 # Gets sphere raw data
-def get_sphere(data):	
-	global sphere_x
-	global sphere_y
-	global sphere_z
-	global sphere_radius
+def get_sData(data):	
+	global xraw
+	global yraw
+	global zraw
+	global radiusraw
 	
-	sphere_x = data.xc
-	sphere_y = data.yc
-	sphere_z = data.zc
-	sphere_radius = data.radius
-	recieved_sphere_data = True 
-	
-def rqt_listener(data):
-	global rqt_toggle
-	rqt_toggle = data.data
-	
-
-def pause_listener(data):
-	global pause_toggle
-	pause_toggle = data.data
-	
+	xraw = data.xc
+	yraw = data.yc
+	zraw = data.zc
+	radiusraw = data.radius
+	recieved_sdata = True 
 	
 if __name__ == '__main__':
 	# Initialize the node
 	rospy.init_node('simple_planner', anonymous = True)
 	# Subscriber for sphere parameters
-	rospy.Subscriber('sphere_params', SphereParams, get_sphere)
+	rospy.Subscriber('sphere_params', SphereParams, get_sData)
 	# Publisher for sending joint positions
 	plan_pub = rospy.Publisher('/plan', Plan, queue_size = 10)
-	# Subscribers to cancel plan 
-	rqt_toggle = rospy.Subscriber("/rqt_toggle", Bool, rqt_listener)
-	# Subscriber to pause plan 
-	pause_toggle = rospy.Subscriber("/pause_toggle", Bool, pause_listener)
 	# Set a 10Hz frequency
 	loop_rate = rospy.Rate(10)
 	
@@ -73,7 +60,7 @@ if __name__ == '__main__':
 		tfBuffer = tf2_ros.Buffer()
 		listener = tf2_ros.TransformListener(tfBuffer)
 		if True: 
-			# try getting the most update transformation between the camera frame and the base frame
+			# get most recent transformation between the camera frame and the base frame
 			try:
 				trans = tfBuffer.lookup_transform("base", "camera_color_optical_frame", rospy.Time())
 			except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
@@ -81,42 +68,43 @@ if __name__ == '__main__':
 				loop_rate.sleep()
 				continue
 			# Define points in camera frame
-			pt_in_cam = tf2_geometry_msgs.PointStamped()
-			pt_in_cam.header.frame_id = 'camera_color_optical_frame'
-			pt_in_cam.header.stamp = rospy.get_rostime()
+			ptcam = tf2_geometry_msgs.PointStamped()
+			ptcam.header.frame_id = 'camera_color_optical_frame'
+			ptcam.header.stamp = rospy.get_rostime()
 
-			pt_in_cam.point.x = sphere_x
-			pt_in_cam.point.y = sphere_y
-			pt_in_cam.point.z = sphere_z
+			ptcam.point.x = xraw
+			ptcam.point.y = yraw
+			ptcam.point.z = zraw
 
 			# Convert points to base frame
-			pt_in_base = tfBuffer.transform(pt_in_cam,'base', rospy.Duration(1.0))
-			x,y,z,radius = pt_in_base.point.x, pt_in_base.point.y, pt_in_base.point.z, sphere_radius
+			ptbase = tfBuffer.transform(ptcam,'base', rospy.Duration(1.0))
+			x = ptbase.point.x
+			y = ptbase.point.y
+			z = ptbase.point.z
+			radius = radiusraw
 
 			# Print coor before and after transform 
-			print("Before tranformed: \n", "x: ", sphere_x, "y: ", sphere_y, "z: ", sphere_z, "radius: ", sphere_radius, "\n")
+			print("Before tranformed: \n", "x: ", xraw, "y: ", yraw, "z: ", zraw, "radius: ", radiusraw, "\n")
 			print("Transformed: \n", "x: ", x, "y: ", y, "z: ", z, "radius: ", radius, "\n")
 
 			# Define plan
 			plan = Plan()
-
+			# angular values stay the same
+			x_ang = 3.14
+			y_ang = 0.0
+			z_ang = 1.57
 			# Starting position 
-			add_point(-0.201, -0.595, 0.375, 3.13, 0.19, 2.568, plan)
+			add_point(0.3, -0.35, 0.3, x_ang, y_ang, z_ang, plan)
 			# Position with x, y, z + radius
-			add_point(x, y, z+radius, 3.13, 0.19, 2.568, plan)
+			add_point(x, y, z+radius, x_ang, y_ang, z_ang, plan)
 			# Turn right 
-			add_point(-0.5, -0.595, 0.375, 3.13, 0.19, 2.568, plan)
+			add_point(0.3, -0.35, 0.3, x_ang, y_ang, z_ang, plan)
 			# Decrease z to drop ball 
-			add_point(-0.5, -0.595, z+radius, 3.13, 0.19, 2.568, plan)
+			add_point(0.3, -0.35, z+radius, x_ang, y_ang, z_ang, plan)
 			# Back to Start
-			add_point(-0.201, -0.595, 0.375, 3.13, 0.19, 2.568, plan)
-			# If not cancelled 
-			# if not rqt_toggle:
-				# publish the plan
+			add_point(0.3, -0.35, 0.3, x_ang, y_ang, z_ang, plan)
+			
+			# publish the plan
 			plan_pub.publish(plan)
-			# If plan pause publish blank plan
-			#if pause_toggle: 
-				#plan_pub.publish(Plan())
-			# wait for 0.1 seconds until the next loop and repeat
 			loop_rate.sleep()
 		
