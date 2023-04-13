@@ -64,7 +64,7 @@ if __name__ == '__main__':
 	
 	delay = 0
 	first_fil = True
-	off_print = True
+	off_message = True
 	
 	# set fil gain
 	#fil_gain = 0.05 # how much of the most recent input is included 
@@ -108,9 +108,9 @@ if __name__ == '__main__':
 						fil_outr = r
 				# else if not tracking
 				else:
-					if off_print: 
+					if off_message: 
 						print("ball filter is disabled")
-						off_print = False
+						off_message = False
 					first_fil = True
 				sp_data = SphereParams()
 				# add sphere params to publisher
