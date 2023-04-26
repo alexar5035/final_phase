@@ -83,6 +83,11 @@ if __name__ == '__main__':
 	rospy.Subscriber('sphere_params', SphereParams, get_sData)
 	# Publisher for sending joint positions
 	plan_pub = rospy.Publisher('/plan', Plan, queue_size = 10)
+	# Subscriber to cancel plan
+	rqt_toggle = rospy.Subscriber('/rqt_toggle', Bool, rqt_listener)
+	# Subscriber to pause
+	pause_toggle = rospy.Subscriber('/pause_toggle', Bool, pause_listener)
+	rospy.Subscriber('/ur5e/toolpose', Twist, get_pos)
 	# Set a 10Hz frequency
 	loop_rate = rospy.Rate(10)
 	# Check if a plan has been created 
