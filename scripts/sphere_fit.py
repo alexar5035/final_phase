@@ -12,11 +12,14 @@ a_matrix = []
 b_matrix = []
 recieved = False
 
+# gets ball data from publisher
 def receive(data):
+	# access global variables
 	global a_matrix
 	global b_matrix
 	global recieved
 	
+	# empty lists for new dataset
 	a_matrix = []
 	b_matrix = []
 	
@@ -28,14 +31,14 @@ def receive(data):
 			b_matrix.append([point.x**2 + point.y**2 + point.z**2])
 	recieved = True
 			
-
+# filters the data
 def filter(data, fil_out, fil_gain):
 	#initialize
 	fil_in = data
 	# filter equation
 	fil_out = (fil_gain*fil_in) + (1-fil_gain)*fil_out
 	return fil_out
-	
+# bool	
 tracking = None
 def track(data):
 	global tracking
@@ -59,20 +62,20 @@ if __name__ == '__main__':
 	fil_outz = 0.0
 	fil_outr = 0.0
 	
+	# gains
 	pt_gain = 0.0005
-	r_gain = 0.005
+	r_gain = 0.0005
 	
 	delay = 0
 	first_fil = True
 	off_message = True
 	
-	# set fil gain
-	#fil_gain = 0.05 # how much of the most recent input is included 
-	
 	while not rospy.is_shutdown():
 		if recieved:
+			# define A and B matrices
 			A = np.array(a_matrix)
-			B = np.array(b_matrix)
+			B = np.array([b_matrix]).T
+			
 			if A.shape[0] == B.shape[0] and len(A.shape) == 2 and len(B.shape) == 2:
 				# calc P
 				P = np.linalg.lstsq(A, B, rcond = None)[0]
@@ -83,6 +86,7 @@ if __name__ == '__main__':
 				# radius calculation: SQRT(P[3] + Xc^2 + Yc^2 + Zc^2)
 				r = math.sqrt(P[3] + xc**2 + yc**2 + zc**2)
 				
+				# if tracking = true
 				if tracking:
 					# shows msg if filter is disabled
 					off_print = True 
@@ -112,6 +116,7 @@ if __name__ == '__main__':
 						print("ball filter is disabled")
 						off_message = False
 					first_fil = True
+				# pub variable
 				sp_data = SphereParams()
 				# add sphere params to publisher
 				sp_data.xc = xc
