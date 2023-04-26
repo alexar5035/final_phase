@@ -74,7 +74,7 @@ if __name__ == '__main__':
 		if recieved:
 			# define A and B matrices
 			A = np.array(a_matrix)
-			B = np.array([b_matrix]).T
+			B = np.array(b_matrix)
 			
 			if A.shape[0] == B.shape[0] and len(A.shape) == 2 and len(B.shape) == 2:
 				# calc P

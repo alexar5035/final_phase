@@ -146,12 +146,12 @@ if __name__ == '__main__':
 			new_point(x, y+y_off, z+.02, x_ang, y_ang, z_ang, closed, plan)
 			new_point(x, y+y_off, z+.1, x_ang, y_ang, z_ang, stayed, plan)
 			# Third point: up and to the right
-			new_point(0.3, -0.35, 0.3, x_ang, y_ang, z_ang, plan)
+			new_point(0.3, -0.35, 0.3, x_ang, y_ang, z_ang, stayed, plan)
 			# Fourth point: Decrease z to drop ball 
 			new_point(0.3, -0.35, z+radius, x_ang, y_ang, z_ang, stayed, plan)
-			new_point(0.3, -.35, z+.02, x_ang, y_ang, z_ang, stayed, plan)
+			#new_point(0.3, -.35, z+.02, x_ang, y_ang, z_ang, stayed, plan)
 			# Fifth point: decrease z, drop ball
-			new_point(0.3, -0.35, 0.3, x_ang, y_ang, z_ang, opened, plan)
+			new_point(0.3, -0.35, z+radius, x_ang, y_ang, z_ang, opened, plan)
 			# Sixth point: drop to stay
 			new_point(-0.014, -0.35, 0.3, x_ang, y_ang, z_ang, stayed, plan)
 			planned = True
